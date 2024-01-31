@@ -1,0 +1,16 @@
+{
+  "name": "neo4u",
+  "license": "GPL-3.0",
+  "module": "src/index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "log4js": "^6.9.1",
+    "neo4j-driver": "^5.17.0"
+  }
+}
