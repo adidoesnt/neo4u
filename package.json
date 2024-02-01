@@ -12,5 +12,9 @@
   "dependencies": {
     "log4js": "^6.9.1",
     "neo4j-driver": "^5.17.0"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun run --hot src/index.ts"
   }
 }
