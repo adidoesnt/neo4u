@@ -6,7 +6,7 @@ describe("Logger", () => {
     const loggerConfigSpy = spyOn(log4js, "configure");
     const loggerGetSpy = spyOn(log4js, "getLogger");
 
-    it('should not allow direct instantiation', () => {
+    it('should construct a logger', () => {
         try {
             // @ts-ignore
             new Logger();
