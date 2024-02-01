@@ -16,6 +16,7 @@ export class Connection {
 
     constructor(config: Neo4jConfiguration) {
         this.uri = this.getUri(config);
+        console.log(this.uri)
         const { user, password } = config;
         this.logger.info(`establishing connection to ${this.uri}`);
         try {
