@@ -2,6 +2,9 @@ import { driver, auth, type Driver, type Session } from 'neo4j-driver';
 import { Logger } from './Logger';
 const { basic } = auth;
 
+/**
+ * Configuration for a Neo4j connection.
+ */
 export type Neo4jConfiguration = {
     protocol: string;
     host: string;
@@ -10,17 +13,29 @@ export type Neo4jConfiguration = {
     password: string;
 };
 
+/**
+ * Class representing a connection to a Neo4j database.
+ */
 export class Connection {
     private driver: Driver;
     private session: Session;
     private uri: string;
     private logger = Logger.getLogger('connection');
 
+    /**
+     * Get the URI for a Neo4j connection.
+     * @param {Neo4jConfiguration} config - The configuration for the connection.
+     * @returns {string} The connection URI.
+     */
     getUri(config: Neo4jConfiguration): string {
         const { protocol, host, port } = config;
         return `${protocol}://${host}:${port}`;
     }
 
+    /**
+     * Create a new connection.
+     * @param {Neo4jConfiguration} config - The configuration for the connection.
+     */
     constructor(config: Neo4jConfiguration) {
         this.uri = this.getUri(config);
         console.log(this.uri);
@@ -36,10 +51,17 @@ export class Connection {
         this.logger.info(`successfully connected to ${this.uri}`);
     }
 
-    getSession(): any {
+    /**
+     * Get the current session.
+     * @returns {Session} The current session.
+     */
+    getSession(): Session {
         return this.session;
     }
 
+    /**
+     * Close the connection.
+     */
     close(): void {
         try {
             this.logger.info(`closing connection to ${this.uri}`);
