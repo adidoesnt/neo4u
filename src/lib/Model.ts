@@ -3,14 +3,27 @@ import { modelMetaDataKey } from './Decorator';
 import type { Session } from 'neo4j-driver';
 import { Logger } from './Logger';
 
+/**
+ * Abstract class representing a model.
+ * Provides methods for interacting with the database.
+ */
 export abstract class Model {
     protected static session?: Session;
     private static logger = Logger.getLogger('model');
 
+    /**
+     * Add the model to a session.
+     * @param {Session} session - The session to add the model to.
+     */
     static setSession(session: Session): void {
         Model.session = session;
     }
 
+    /**
+     * Create a new instance of the model.
+     * @param {T} props - The properties of the new instance.
+     * @returns {Promise<T | null>} The created instance, or null if an error occurred.
+     */
     static async create<T extends new (...args: any[]) => Model>(
         this: T,
         props: InstanceType<T>,
@@ -33,6 +46,12 @@ export abstract class Model {
         }
     }
 
+    /**
+     * Get the conditions for a query.
+     * @param {Partial<InstanceType<any>>} props - The properties to include in the conditions.
+     * @param {string} propsName - The name to use for the properties in the query.
+     * @returns {string} The conditions for the query.
+     */
     static getConditions(
         props: Partial<InstanceType<any>>,
         propsName: string = 'props',
@@ -42,6 +61,11 @@ export abstract class Model {
             .join(' AND ');
     }
 
+    /**
+     * Find instances of the model that match the specified properties.
+     * @param {Partial<InstanceType<T>>} props - The properties to match.
+     * @returns {Promise<T[]>} The matching instances.
+     */
     static async find<T extends new (...args: any[]) => Model>(
         this: T,
         props: Partial<InstanceType<T>>,
@@ -63,6 +87,11 @@ export abstract class Model {
         }
     }
 
+    /**
+     * Find one instance of the model that matches the specified properties.
+     * @param {Partial<InstanceType<T>>} props - The properties to match.
+     * @returns {Promise<T | null>} The matching instance, or null if no match was found.
+     */
     static async findOne<T extends new (...args: any[]) => Model>(
         this: T,
         props: Partial<InstanceType<T>>,
@@ -76,6 +105,11 @@ export abstract class Model {
         }
     }
 
+    /**
+     * Delete instances of the model that match the specified properties.
+     * @param {Partial<InstanceType<T>>} props - The properties to match.
+     * @returns {Promise<boolean>} True if the operation was successful, false otherwise.
+     */
     static async delete<T extends new (...args: any[]) => Model>(
         this: T,
         props: Partial<InstanceType<T>>,
@@ -94,6 +128,11 @@ export abstract class Model {
         }
     }
 
+    /**
+     * Detach and delete instances of the model that match the specified properties.
+     * @param {Partial<InstanceType<T>>} props - The properties to match.
+     * @returns {Promise<boolean>} True if the operation was successful, false otherwise.
+     */
     static async detachDelete<T extends new (...args: any[]) => Model>(
         this: T,
         props: Partial<InstanceType<T>>,
@@ -112,6 +151,12 @@ export abstract class Model {
         }
     }
 
+    /**
+     * Get the set statements for an update query.
+     * @param {Partial<InstanceType<any>>} props - The properties to include in the set statements.
+     * @param {string} propsName - The name to use for the properties in the query.
+     * @returns {string} The set statements for the query.
+     */
     static getSetStatements(
         props: Partial<InstanceType<any>>,
         propsName: string,
@@ -121,6 +166,12 @@ export abstract class Model {
             .join(', ');
     }
 
+    /**
+     * Update instances of the model that match the specified properties.
+     * @param {Partial<InstanceType<T>>} props - The properties to match.
+     * @param {Partial<InstanceType<T>>} newProps - The new properties to set.
+     * @returns {Promise<T | null>} The updated instance, or null if an error occurred.
+     */
     static async update<T extends new (...args: any[]) => Model>(
         this: T,
         props: Partial<InstanceType<T>>,
