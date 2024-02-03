@@ -1,5 +1,5 @@
 {
-    "name": "neo4u-node",
+    "name": "neo4u",
     "version": "0.0.1",
     "description": "A simple typescript OGM for Neo4j.",
     "main": "./dist/index.js",
