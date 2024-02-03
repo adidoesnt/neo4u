@@ -10,11 +10,15 @@ import {
     Entity, Model, 
     Neo4u, 
     Property 
-} from './lib';
+} from 'neo4u-node';
 
 @Entity('Test')
 class Test extends Model {
-    @Property({ name: 'id', type: DataType.Number, primary: true })
+    @Property({ 
+        name: 'id', 
+        type: DataType.Number,
+        primary: true 
+    })
     name: string;
 
     constructor(name: string) {
