@@ -27,8 +27,8 @@ export interface PropertyOptions {
     default?: any;
 }
 
-const modelMetaDataKey = Symbol('modelMetaData');
-const propertyMetaDataKey = Symbol('propertyMetaData');
+export const modelMetaDataKey = Symbol('modelMetaData');
+export const propertyMetaDataKey = Symbol('propertyMetaData');
 
 /**
  * Class decorator for specifying the model name of a class.
