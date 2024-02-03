@@ -25,8 +25,8 @@ export const modelMetaDataKey = Symbol('modelMetaData');
 export const propertyMetaDataKey = Symbol('propertyMetaData');
 
 export function Entity(modelName: string) {
-    return function (constructor: Function) {
-        Reflect.defineMetadata(modelMetaDataKey, modelName, constructor);
+    return function (target: any) {
+        Reflect.defineMetadata(modelMetaDataKey, modelName, target);
     };
 }
 
