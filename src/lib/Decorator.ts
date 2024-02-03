@@ -1,5 +1,8 @@
 import 'reflect-metadata';
 
+/**
+ * Enum representing the possible data types for a property.
+ */
 export enum DataType {
     String = 'string',
     Number = 'number',
@@ -12,6 +15,9 @@ export enum DataType {
     BooleanArray = 'boolean[]',
 }
 
+/**
+ * Interface representing the options for a property.
+ */
 export interface PropertyOptions {
     name: string;
     type: DataType;
@@ -21,15 +27,23 @@ export interface PropertyOptions {
     default?: any;
 }
 
-export const modelMetaDataKey = Symbol('modelMetaData');
-export const propertyMetaDataKey = Symbol('propertyMetaData');
+const modelMetaDataKey = Symbol('modelMetaData');
+const propertyMetaDataKey = Symbol('propertyMetaData');
 
+/**
+ * Class decorator for specifying the model name of a class.
+ * @param {string} modelName - The name of the model.
+ */
 export function Entity(modelName: string) {
     return function (target: any) {
         Reflect.defineMetadata(modelMetaDataKey, modelName, target);
     };
 }
 
+/**
+ * Property decorator for specifying the metadata of a property.
+ * @param {PropertyOptions} metadata - The metadata of the property.
+ */
 export function Property(metadata: PropertyOptions) {
     return function (target: any, propertyKey: string) {
         Reflect.defineMetadata(
