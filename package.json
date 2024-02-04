@@ -7,7 +7,8 @@
     "types": "./dist/index.d.ts",
     "scripts": {
         "format": "prettier --write .",
-        "build": "tsup"
+        "build": "tsup",
+        "publish": "npm publish"
     },
     "author": "Aditya Banerjee",
     "license": "GPL-3.0",
@@ -17,6 +18,7 @@
         "ogm"
     ],
     "devDependencies": {
+        "@types/bun": "^1.0.4",
         "prettier": "^3.2.4",
         "tsup": "^8.0.1",
         "typescript": "^5.3.3"

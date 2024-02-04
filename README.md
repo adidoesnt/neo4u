@@ -71,7 +71,9 @@ const result = neo4u
 ```
 
 ## Using Entities
+
 Once again, we start by importing the necessary types:
+
 ```
 import {
     Configuration,
@@ -84,6 +86,7 @@ import {
 ```
 
 Just like before, we create our configuration object:
+
 ```
 const config: Configuration = {
     neo4j: {
@@ -97,6 +100,7 @@ const config: Configuration = {
 ```
 
 We instantiate Neo4u with this configuration:
+
 ```
 const neo4u: Neo4u = new Neo4u(config);
 ```
@@ -104,6 +108,7 @@ const neo4u: Neo4u = new Neo4u(config);
 Now, we are going to try to use entity and property decorators. These are useful for defining our models.
 
 The entity decorator is the name of the model, while the property decorator(s) identify the property metadata for the model.
+
 ```
 @Entity('Test')
 class Test extends Model {
@@ -122,12 +127,14 @@ class Test extends Model {
 ```
 
 Now that we have created a model, we are ready to use it. But before that we must register our model with the current session:
+
 ```
 const session = neo4u.getSession();
 Test.setSession(session);
 ```
 
 Now the model can be used to carry out CRUD operations:
+
 ```
 Test.create({ name: 'test' }).then((result) => {
     neo4u.close();
@@ -136,6 +143,7 @@ Test.create({ name: 'test' }).then((result) => {
 ```
 
 Our code should look like this:
+
 ```
 import {
     Configuration,

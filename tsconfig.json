@@ -12,7 +12,7 @@
         "noEmit": true,
         "outDir": "dist",
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
     },
     "include": ["src"],
     "exclude": ["node_modules"],
