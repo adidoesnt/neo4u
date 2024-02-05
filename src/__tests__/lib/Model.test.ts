@@ -26,6 +26,9 @@ describe('Model', () => {
                                     properties: {
                                         name: 'test',
                                     },
+                                    identity: {
+                                        toNumber: mock(() => 1),
+                                    },
                                 };
                             }),
                         },
@@ -50,12 +53,13 @@ describe('Model', () => {
         Test.setSession(session);
         const test = await Test.create({ name: 'test' });
         expect(session.run).toHaveBeenCalledWith(
-            'CREATE (n:Test $props) RETURN n',
+            'CREATE (n:Test $props) RETURN n, ID(n) as _id',
             { props: { name: 'test' } },
         );
         expect(test).toStrictEqual({
+            _id: 1,
             name: 'test',
-        } as typeof test);
+        } as typeof test & { _id: number });
     });
 
     it('should throw an error when creating a node', async () => {
@@ -96,6 +100,9 @@ describe('Model', () => {
                                     properties: {
                                         name: 'test',
                                     },
+                                    identity: {
+                                        toNumber: mock(() => 1),
+                                    },
                                 };
                             }),
                         },
@@ -121,6 +128,7 @@ describe('Model', () => {
         const result = await Test.find({ name: 'test' });
         expect(result).toStrictEqual([
             {
+                _id: 1,
                 name: 'test',
             },
         ] as unknown as typeof result);
@@ -136,6 +144,9 @@ describe('Model', () => {
                                 return {
                                     properties: {
                                         name: 'test',
+                                    },
+                                    identity: {
+                                        toNumber: mock(() => 1),
                                     },
                                 };
                             }),
@@ -161,6 +172,7 @@ describe('Model', () => {
         Test.setSession(session);
         const result = await Test.findOne({ name: 'test' });
         expect(result).toStrictEqual({
+            _id: 1,
             name: 'test',
         } as unknown as typeof result);
     });
@@ -222,6 +234,9 @@ describe('Model', () => {
                                     properties: {
                                         name: 'test2',
                                     },
+                                    identity: {
+                                        toNumber: mock(() => 1),
+                                    },
                                 };
                             }),
                         },
@@ -246,7 +261,7 @@ describe('Model', () => {
         Test.setSession(session);
         const test = await Test.update({ name: 'test' }, { name: 'test2' });
         expect(session.run).toHaveBeenCalledWith(
-            'MATCH (n:Test) WHERE n.name = $props.name SET n.name = $newProps.name RETURN n',
+            'MATCH (n:Test) WHERE n.name = $props.name SET n.name = $newProps.name RETURN n, ID(n) as _id',
             {
                 props: {
                     name: 'test',
@@ -256,8 +271,11 @@ describe('Model', () => {
                 },
             },
         );
-        expect(test).toStrictEqual({
-            name: 'test2',
-        } as typeof test);
+        expect(test).toStrictEqual([
+            {
+                _id: 1,
+                name: 'test2',
+            },
+        ] as unknown as typeof test & { _id: number }[]);
     });
 });

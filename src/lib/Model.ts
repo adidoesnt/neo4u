@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { modelMetaDataKey } from './Decorator';
-import type { Session } from 'neo4j-driver';
+import type { Node, Session } from 'neo4j-driver';
 import { Logger } from './Logger';
 
 /**
@@ -31,12 +31,16 @@ export abstract class Model {
         try {
             const modelName = Reflect.getMetadata(modelMetaDataKey, this);
             const result = await Model.session?.run(
-                `CREATE (n:${modelName} $props) RETURN n`,
+                `CREATE (n:${modelName} $props) RETURN n, ID(n) as _id`,
                 { props },
             );
             const record = result?.records?.shift();
             if (record) {
-                return record.get('n').properties as T;
+                const node = record.get('n') as Node;
+                const _id = node.identity.toNumber();
+                const properties = node.properties;
+                properties._id = _id;
+                return properties as T;
             } else {
                 throw new Error('error creating node');
             }
@@ -68,18 +72,29 @@ export abstract class Model {
      */
     static async find<T extends new (...args: any[]) => Model>(
         this: T,
-        props: Partial<InstanceType<T>>,
+        props: Partial<InstanceType<T>> & { _id?: number },
     ): Promise<T[]> {
         try {
             const modelName = Reflect.getMetadata(modelMetaDataKey, this);
             const conditions = Model.getConditions(props);
-            const result = await Model.session?.run(
-                `MATCH (n:${modelName}) WHERE ${conditions} RETURN n`,
-                { props },
-            );
+            const result = props._id
+                ? await Model.session?.run(
+                      `MATCH (n:${modelName}) WHERE ID(n) = $id RETURN n, ID(n) as _id`,
+                      { id: props._id },
+                  )
+                : await Model.session?.run(
+                      `MATCH (n:${modelName}) WHERE ${conditions} RETURN n`,
+                      { props },
+                  );
             const records = result?.records ?? [];
             return (
-                records.map((record) => record.get('n').properties as T) ?? []
+                records.map((record) => {
+                    const node = record.get('n') as Node;
+                    const _id = node.identity.toNumber();
+                    const properties = node.properties;
+                    properties._id = _id;
+                    return properties as T;
+                }) ?? []
             );
         } catch (error) {
             Model.logger.error('error finding node', error);
@@ -112,15 +127,20 @@ export abstract class Model {
      */
     static async delete<T extends new (...args: any[]) => Model>(
         this: T,
-        props: Partial<InstanceType<T>>,
+        props: Partial<InstanceType<T>> & { _id?: number },
     ): Promise<boolean> {
         try {
             const modelName = Reflect.getMetadata(modelMetaDataKey, this);
             const conditions = Model.getConditions(props);
-            await Model.session?.run(
-                `MATCH (n:${modelName}) WHERE ${conditions} DELETE n`,
-                { props },
-            );
+            props._id
+                ? await Model.session?.run(
+                      `MATCH (n:${modelName}) WHERE ID(n) = $id DELETE n`,
+                      { id: props._id },
+                  )
+                : await Model.session?.run(
+                      `MATCH (n:${modelName}) WHERE ${conditions} DELETE n`,
+                      { props },
+                  );
             return true;
         } catch (error) {
             Model.logger.error('error deleting node', error);
@@ -135,15 +155,20 @@ export abstract class Model {
      */
     static async detachDelete<T extends new (...args: any[]) => Model>(
         this: T,
-        props: Partial<InstanceType<T>>,
+        props: Partial<InstanceType<T>> & { _id?: number },
     ): Promise<boolean> {
         try {
             const modelName = Reflect.getMetadata(modelMetaDataKey, this);
             const conditions = Model.getConditions(props);
-            await Model.session?.run(
-                `MATCH (n:${modelName}) WHERE ${conditions} DETACH DELETE n`,
-                { props },
-            );
+            props._id
+                ? await Model.session?.run(
+                      `MATCH (n:${modelName}) WHERE ID(n) = $id DETACH DELETE n`,
+                      { id: props._id },
+                  )
+                : await Model.session?.run(
+                      `MATCH (n:${modelName}) WHERE ${conditions} DETACH DELETE n`,
+                      { props },
+                  );
             return true;
         } catch (error) {
             Model.logger.error('error detaching and deleting node', error);
@@ -174,26 +199,35 @@ export abstract class Model {
      */
     static async update<T extends new (...args: any[]) => Model>(
         this: T,
-        props: Partial<InstanceType<T>>,
+        props: Partial<InstanceType<T>> & { _id?: number },
         newProps: Partial<InstanceType<T>>,
-    ): Promise<T | null> {
+    ): Promise<T[]> {
         try {
             const modelName = Reflect.getMetadata(modelMetaDataKey, this);
             const conditions = Model.getConditions(props, 'props');
             const setStatements = Model.getSetStatements(newProps, 'newProps');
-            const result = await Model.session?.run(
-                `MATCH (n:${modelName}) WHERE ${conditions} SET ${setStatements} RETURN n`,
-                { props, newProps },
+            const result = props._id
+                ? await Model.session?.run(
+                      `MATCH (n:${modelName}) WHERE ID(n) = $id SET ${setStatements} RETURN n, ID(n) as _id`,
+                      { id: props._id, newProps },
+                  )
+                : await Model.session?.run(
+                      `MATCH (n:${modelName}) WHERE ${conditions} SET ${setStatements} RETURN n, ID(n) as _id`,
+                      { props, newProps },
+                  );
+            const records = result?.records ?? [];
+            return (
+                records.map((record) => {
+                    const node = record.get('n') as Node;
+                    const _id = node.identity.toNumber();
+                    const properties = node.properties;
+                    properties._id = _id;
+                    return properties as T;
+                }) ?? []
             );
-            const record = result?.records?.shift();
-            if (record) {
-                return record.get('n').properties as T;
-            } else {
-                throw new Error('error updating node');
-            }
         } catch (error) {
             Model.logger.error('error updating node', error);
-            return null;
+            return [];
         }
     }
 }
