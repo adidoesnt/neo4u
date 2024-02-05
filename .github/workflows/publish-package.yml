@@ -13,6 +13,9 @@ jobs:
             github.event.workflow_run.conclusion == 'success' &&
             github.event.workflow_run.head_branch == 'main'
         steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
@@ -34,8 +37,5 @@ jobs:
             - name: Publish
               run: |
                   bun run publish
-
-            - name: Publish
-              run: npm publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
