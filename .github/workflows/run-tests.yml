@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - main
+            - feature/*
     pull_request:
         branches:
             - main
@@ -12,10 +13,17 @@ jobs:
     test:
         runs-on: ubuntu-latest
         steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
             - name: Setup bun
               uses: oven-sh/setup-bun@v1
               with:
                 bun-version: latest
+
+            - name: Install dependencies
+              run: |
+                bun install
 
             - name: Run tests
               run: |
